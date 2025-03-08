@@ -23,6 +23,8 @@ import com.google.common.collect.Streams;
 import io.trino.Session;
 import io.trino.SystemSessionProperties;
 import io.trino.metadata.Metadata;
+import io.trino.operator.table.ExcludeColumnsFunction;
+import io.trino.spi.connector.ColumnHandle;
 import io.trino.spi.type.Type;
 import io.trino.sql.PlannerContext;
 import io.trino.sql.ir.Between;
@@ -56,6 +58,8 @@ import io.trino.sql.planner.plan.SemiJoinNode;
 import io.trino.sql.planner.plan.SimplePlanRewriter;
 import io.trino.sql.planner.plan.SortNode;
 import io.trino.sql.planner.plan.SpatialJoinNode;
+import io.trino.sql.planner.plan.TableFunctionNode;
+import io.trino.sql.planner.plan.TableFunctionProcessorNode;
 import io.trino.sql.planner.plan.TableScanNode;
 import io.trino.sql.planner.plan.TopNRankingNode;
 import io.trino.sql.planner.plan.UnionNode;
@@ -226,6 +230,25 @@ public class PredicatePushDown
             }
 
             return node;
+        }
+
+        @Override
+        public PlanNode visitTableFunctionProcessor(TableFunctionProcessorNode node, RewriteContext<Expression> context) {
+            // Allow predicate push down through exclude_columns
+            if (node.getName().equals(ExcludeColumnsFunction.NAME)) {
+                if (node.getSources().size() == 1) {
+                    PlanNode source = node.getSources().getFirst();
+                    Map<Symbol, Expression> assignments = new HashMap<>();
+                    for (int i = 0; i < node.getOutputSymbols().size(); i++) {
+                        assignments.put(node.getOutputSymbols().get(i), source.getOutputSymbols().get(i).toSymbolReference());
+                    }
+                    return new FilterNode(
+                            idAllocator.getNextId(),
+                            new ProjectNode(idAllocator.getNextId(), source, new Assignments(assignments)),
+                            context.get());
+                }
+            }
+            return super.visitTableFunctionProcessor(node, context);
         }
 
         @Override
