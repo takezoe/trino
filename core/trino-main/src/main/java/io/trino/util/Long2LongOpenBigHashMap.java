@@ -659,9 +659,8 @@ public class Long2LongOpenBigHashMap
         if (newValue == null) {
             return defRetValue;
         }
-        final long v = newValue.longValue();
-        insert(-pos - 1, k, v);
-        return v;
+        insert(-pos - 1, k, newValue);
+        return newValue;
     }
 
     /**
@@ -676,7 +675,7 @@ public class Long2LongOpenBigHashMap
         if (pos < 0) {
             return defRetValue;
         }
-        final Long newValue = remappingFunction.apply(Long.valueOf(k), Long.valueOf(value.get(pos)));
+        final Long newValue = remappingFunction.apply(k, value.get(pos));
         if (newValue == null) {
             if (k == 0) {
                 removeNullEntry();
@@ -686,8 +685,8 @@ public class Long2LongOpenBigHashMap
             }
             return defRetValue;
         }
-        value.set(pos, newValue.longValue());
-        return newValue.longValue();
+        value.set(pos, newValue);
+        return newValue;
     }
 
     /**
@@ -699,7 +698,7 @@ public class Long2LongOpenBigHashMap
     {
         requireNonNull(remappingFunction);
         final long pos = find(k);
-        final Long newValue = remappingFunction.apply(Long.valueOf(k), pos >= 0 ? Long.valueOf(value.get(pos)) : null);
+        final Long newValue = remappingFunction.apply(k, pos >= 0 ? value.get(pos) : null);
         if (newValue == null) {
             if (pos >= 0) {
                 if (k == 0) {
@@ -711,13 +710,12 @@ public class Long2LongOpenBigHashMap
             }
             return defRetValue;
         }
-        long newVal = newValue.longValue();
         if (pos < 0) {
-            insert(-pos - 1, k, newVal);
-            return newVal;
+            insert(-pos - 1, k, newValue);
+            return newValue;
         }
-        value.set(pos, newVal);
-        return newVal;
+        value.set(pos, newValue);
+        return newValue;
     }
 
     /**
@@ -733,7 +731,7 @@ public class Long2LongOpenBigHashMap
             insert(-pos - 1, k, v);
             return v;
         }
-        final Long newValue = remappingFunction.apply(Long.valueOf(value.get(pos)), Long.valueOf(v));
+        final Long newValue = remappingFunction.apply(value.get(pos), v);
         if (newValue == null) {
             if (k == 0) {
                 removeNullEntry();
@@ -743,8 +741,8 @@ public class Long2LongOpenBigHashMap
             }
             return defRetValue;
         }
-        value.set(pos, newValue.longValue());
-        return newValue.longValue();
+        value.set(pos, newValue);
+        return newValue;
     }
 
     /**
@@ -824,7 +822,7 @@ public class Long2LongOpenBigHashMap
         @Override
         public Long getKey()
         {
-            return Long.valueOf(key.get(index));
+            return key.get(index);
         }
 
         /**
@@ -836,7 +834,7 @@ public class Long2LongOpenBigHashMap
         @Override
         public Long getValue()
         {
-            return Long.valueOf(value.get(index));
+            return value.get(index);
         }
 
         /**
@@ -848,7 +846,7 @@ public class Long2LongOpenBigHashMap
         @Override
         public Long setValue(final Long v)
         {
-            return Long.valueOf(setValue(v.longValue()));
+            return setValue(v.longValue());
         }
 
         @SuppressWarnings("unchecked")
@@ -859,7 +857,7 @@ public class Long2LongOpenBigHashMap
                 return false;
             }
             Map.Entry<Long, Long> e = (Map.Entry<Long, Long>) o;
-            return (key.get(index) == e.getKey().longValue()) && (value.get(index) == e.getValue().longValue());
+            return (key.get(index) == e.getKey()) && (value.get(index) == e.getValue());
         }
 
         @Override
@@ -1080,8 +1078,8 @@ public class Long2LongOpenBigHashMap
             if (e.getValue() == null || !(e.getValue() instanceof Long)) {
                 return false;
             }
-            final long k = ((Long) e.getKey()).longValue();
-            final long v = ((Long) e.getValue()).longValue();
+            final long k = (Long) e.getKey();
+            final long v = (Long) e.getValue();
             if (k == 0) {
                 return Long2LongOpenBigHashMap.this.containsNullKey && (value.get(n) == v);
             }
@@ -1121,8 +1119,8 @@ public class Long2LongOpenBigHashMap
             if (e.getValue() == null || !(e.getValue() instanceof Long)) {
                 return false;
             }
-            final long k = ((Long) e.getKey()).longValue();
-            final long v = ((Long) e.getValue()).longValue();
+            final long k = (Long) e.getKey();
+            final long v = (Long) e.getValue();
             if (k == 0) {
                 if (containsNullKey && (value.get(n) == v)) {
                     removeNullEntry();

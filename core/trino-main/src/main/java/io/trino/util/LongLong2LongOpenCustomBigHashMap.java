@@ -672,7 +672,7 @@ public class LongLong2LongOpenCustomBigHashMap
             insert(-pos - 1, k1, k2, v);
             return v;
         }
-        final Long newValue = remappingFunction.apply(Long.valueOf(value.get(pos)), Long.valueOf(v));
+        final Long newValue = remappingFunction.apply(value.get(pos), v);
         if (newValue == null) {
             if (strategy.equals(k1, k2, nullKey1, nullKey2)) {
                 removeNullEntry();
@@ -682,8 +682,8 @@ public class LongLong2LongOpenCustomBigHashMap
             }
             return defRetValue;
         }
-        value.set(pos, newValue.longValue());
-        return newValue.longValue();
+        value.set(pos, newValue);
+        return newValue;
     }
 
     /**
