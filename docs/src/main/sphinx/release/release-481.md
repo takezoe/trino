@@ -76,7 +76,13 @@
 
 ## Hudi connector
 
+* {{breaking}} Remove legacy object storage support for Azure Storage,
+  Google Cloud Storage, IBM Cloud Object Storage, S3, and S3-compatible
+  systems. Use native file system support for object storage.
+  `fs.hadoop.enabled` applies only to HDFS. See
+  [legacy file system support](file-system-legacy) for migration details. ({issue}`24878`)
 * Add support for configuring the Azure connection-pool idle time and HTTP request timeout via the `azure.connection-pool-max-idle-time` and `azure.http-request-timeout` configuration properties. ({issue}`29284`)
+* Reduce memory usage when writing files to S3. ({issue}`28488`)
 
 ## Iceberg connector
 
